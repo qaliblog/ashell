@@ -99,10 +99,11 @@ public class TerminalPreferences {
     }
 
     public void setCustomIsoUri(Context context, String uri) {
-        mPrefs.edit().putString("custom_iso_uri", uri).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putString("custom_iso_uri", uri).apply();
     }
 
-    public String getCustomIsoUri() {
-        return mPrefs.getString("custom_iso_uri", null);
+    public String getCustomIsoUri(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString("custom_iso_uri", null);
     }
 }

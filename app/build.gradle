@@ -4,6 +4,7 @@ import java.security.MessageDigest
 apply plugin: 'com.android.application'
 
 android {
+    namespace "app.virtshell"
     compileSdkVersion 30
 
     dependencies {
@@ -39,6 +40,10 @@ android {
             storePassword System.getenv("KEY_PASSPHRASE")
             keyPassword System.getenv("KEY_PASSPHRASE")
         }
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     buildTypes {

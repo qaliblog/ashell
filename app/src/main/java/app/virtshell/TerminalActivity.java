@@ -59,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -230,9 +231,9 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         mIsVisible = true;
 
         if (mTermService != null) {
-            TerminalSession session = mTermService.getSession();
-            if (session != null) {
-                mTerminalView.attachSession(session);
+            List<TerminalSession> sessions = mTermService.getSessions();
+            if (!sessions.isEmpty()) {
+                mTerminalView.attachSession(sessions.get(0));
             }
         }
 
@@ -487,7 +488,7 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         processArgs.add("-nodefaults");
 
         // SCSI CD-ROM(s) and HDD(s).
-        String customIsoUri = mSettings.getCustomIsoUri();
+        String customIsoUri = mSettings.getCustomIsoUri(this);
         if (customIsoUri != null) {
             // For simplicity, we try to use the URI directly if possible or copy it.
             // In a full implementation, we'd need to handle persistent URI permissions.
