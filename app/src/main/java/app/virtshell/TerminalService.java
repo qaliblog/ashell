@@ -1,6 +1,6 @@
 /*
 *************************************************************************
-vShell - x86 Linux virtual shell application powered by QEMU.
+ashell - x86 Linux virtual shell application powered by QEMU.
 Copyright (C) 2019-2021  Leonid Pliushch <leonid.pliushch@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -36,11 +36,14 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import app.virtshell.emulator.TerminalSession;
 import app.virtshell.emulator.TerminalSession.SessionChangedCallback;
 
 /**
- * A service holding a list of terminal sessions, {@link #mTerminalSession}, showing a foreground notification while
+ * A service holding a list of terminal sessions, {@link #mTerminalSessions}, showing a foreground notification while
  * running so that it is not terminated. The user interacts with the session through {@link TerminalActivity}, but this
  * service may outlive the activity when the user or the system disposes of the activity. In that case the user may
  * restart {@link TerminalActivity} later to yet again access the sessions.
@@ -60,7 +63,7 @@ public class TerminalService extends Service implements SessionChangedCallback {
     private static final int NOTIFICATION_ID = 1338;
     private static final String NOTIFICATION_CHANNEL_ID = "app.virtshell.NOTIFICATION_CHANNEL";
 
-    private TerminalSession mTerminalSession = null;
+    private final List<TerminalSession> mTerminalSessions = new ArrayList<>();
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -104,7 +107,9 @@ public class TerminalService extends Service implements SessionChangedCallback {
     public void onDestroy() {
         if (mWakeLock != null) mWakeLock.release();
         if (mWifiLock != null) mWifiLock.release();
-        mTerminalSession.finishIfRunning();
+        for (int i = 0, size = mTerminalSessions.size(); i < size; i++) {
+            mTerminalSessions.get(i).finishIfRunning();
+        }
         stopForeground(true);
     }
 
@@ -183,18 +188,20 @@ public class TerminalService extends Service implements SessionChangedCallback {
         }
     }
 
-    public TerminalSession getSession() {
-        return mTerminalSession;
+    public List<TerminalSession> getSessions() {
+        return mTerminalSessions;
     }
 
-    public void setSession(TerminalSession session) {
-        mTerminalSession = session;
+    public void removeSession(TerminalSession session) {
+        mTerminalSessions.remove(session);
         updateNotification();
     }
 
     public void terminateService() {
         mWantsToStop = true;
-        mTerminalSession.finishIfRunning();
+        for (int i = 0, size = mTerminalSessions.size(); i < size; i++) {
+            mTerminalSessions.get(i).finishIfRunning();
+        }
         stopForeground(true);
         stopSelf();
     }
@@ -208,10 +215,11 @@ public class TerminalService extends Service implements SessionChangedCallback {
 
         StringBuilder contentText = new StringBuilder();
 
-        if (mTerminalSession != null) {
-            contentText.append("Virtual machine is running.");
+        int sessionCount = mTerminalSessions.size();
+        if (sessionCount > 0) {
+            contentText.append(sessionCount).append(" session").append(sessionCount == 1 ? "" : "s").append(" running.");
         } else {
-            contentText.append("Virtual machine is not initialized.");
+            contentText.append("No session running.");
         }
 
         final boolean wakeLockHeld = mWakeLock != null;
@@ -252,7 +260,7 @@ public class TerminalService extends Service implements SessionChangedCallback {
      * Update the shown foreground service notification after making any changes that affect it.
      */
     private void updateNotification() {
-        if (mTerminalSession == null) {
+        if (mTerminalSessions.isEmpty() && mWakeLock == null) {
             // Exit if we are updating after the user disabled all locks with no sessions or tasks running.
             stopSelf();
         } else {

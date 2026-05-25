@@ -1,4 +1,4 @@
-# vShell - functional & design limitations
+# ashell - functional & design limitations
 
 There is a number of limitations implied by application objectives and design
 choices which are expected to be final and would not be re-considered in future
@@ -47,17 +47,17 @@ tasks like video processing, unless you have indefinite amount of time for
 waiting and want to turn your device into portable hand heater.
 
 See [sysbench](https://github.com/akopytov/sysbench) performance comparison
-between [vShell] and Termux PRoot:
+between [ashell] and Termux PRoot:
 
 <p align="center"><img src="./images/sysbench_results.png" width="90%"/></p>
 
-According to benchmark, vShell is 10 times slower than Linux distribution
+According to benchmark, ashell is 10 times slower than Linux distribution
 inside `proot` (AArch64). However be prepared that actual performance in
 certain cases could be lower and may depend on used software or host device.
 
 ## No access to host resources
 
-*Don't even try to root your device with vShell. This is not possible.*
+*Don't even try to root your device with ashell. This is not possible.*
 
 You can't use this application for accessing your USB-OTG drives, smartcards,
 SDR, Wi-Fi or Bluetooth dongles and other hardware.
@@ -67,14 +67,14 @@ using [QEMU].
 
 ## No graphical output support
 
-*vShell is a "virtual shell", isn't it?*
+*ashell is a "virtual shell", isn't it?*
 
 You can install a VNC server inside, but I do not guarantee that graphics
 would be very useful for you due to low performance.
 
 ## Only one terminal session
 
-*This limit arises from a fact that vShell doesn't use QEMU as external
+*This limit arises from a fact that ashell doesn't use QEMU as external
 program. Instead it is merged with terminal emulator code. It is possible
 to implement multiple sessions but will require lot of work.*
 
@@ -106,4 +106,4 @@ how to use it, etc.
 [Alpine Linux]: <https://alpinelinux.org/>
 [QEMU]: <https://qemu.org>
 [Termux]: <https://termux.com>
-[vShell]: <https://github.com/xeffyr/android-vshell>
+[ashell]: <https://github.com/xeffyr/android-ashell>

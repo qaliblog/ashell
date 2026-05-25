@@ -1,6 +1,6 @@
 /*
 *************************************************************************
-vShell - x86 Linux virtual shell application powered by QEMU.
+ashell - x86 Linux virtual shell application powered by QEMU.
 Copyright (C) 2019-2021  Leonid Pliushch <leonid.pliushch@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -96,5 +96,13 @@ public class TerminalPreferences {
 
     public String getDefaultSshUser() {
         return mDefaultSshUser;
+    }
+
+    public void setCustomIsoUri(Context context, String uri) {
+        mPrefs.edit().putString("custom_iso_uri", uri).apply();
+    }
+
+    public String getCustomIsoUri() {
+        return mPrefs.getString("custom_iso_uri", null);
     }
 }

@@ -1,12 +1,12 @@
-# vShell
+# ashell
 
-[vShell] (Virtual Shell) — a successor of [Termux] project which provides an
+[ashell] (Virtual Shell) — a successor of [Termux] project which provides an
 alternate implementation of the Linux terminal emulator for Android OS.
 
 Unlike the original, this application uses [QEMU] to emulate x86_64 hardware to
 run [Alpine Linux] distribution. This approach allows to provide a sane
 distribution independent of Android OS, with own kernel and full root access
-giving full control over the system. Unlike Termux, vShell does not need to port
+giving full control over the system. Unlike Termux, ashell does not need to port
 software packages to Android OS. As result, there are more packages and their
 quality is much higher.
 
@@ -20,10 +20,10 @@ Closest alternatives:
 - [iSH]: Linux shell terminal for IOS devices. User mode emulation.
 - [UserLAnd]: Rootless Linux distribution chroot for Android OS. Uses `proot`.
 
-*[vShell] is a private project even though it is Free and Open Source. It has
+*[ashell] is a private project even though it is Free and Open Source. It has
 been developed specifically for my needs. Considering that Android development
 is not my occupation and neither my hobby, do not expect the great UX, elegant
-coding solutions and so on. vShell is not newbie friendly and never was
+coding solutions and so on. ashell is not newbie friendly and never was
 intended to be such. If you are not skilled in Linux systems, you will not have
 much success with this application.*
 
@@ -52,7 +52,7 @@ Facebook, YouTube and other social media.*
 Overview of used QEMU configuration.
 
 Note that you cannot change configuration from the application itself. If you
-want to adjust QEMU settings, you will need to create your own vShell build.
+want to adjust QEMU settings, you will need to create your own ashell build.
 
 **CPU:**
 
@@ -68,7 +68,7 @@ will have serious impact on battery drain. So 1 core is the optimal value.
 Depends on how much of **free** RAM is available on device.
 
 If you want to maximize the available RAM for the VM, you will need to close
-all heavy apps before starting vShell. Maximal amount of memory which VM can
+all heavy apps before starting ashell. Maximal amount of memory which VM can
 allocate is 2 GiB.
 
 **HDD:**
@@ -121,22 +121,22 @@ to be a general QEMU issue.
 - [Android Terminal Emulator]: One of the first terminal applications for
   Android OS. Now obsolete.
 - [ConnectBot]: The first SSH client for Android OS.
-- [Limbo Emulator]: A QEMU port to Android OS. Unlike vShell, this application
+- [Limbo Emulator]: A QEMU port to Android OS. Unlike ashell, this application
   is generic and doesn't come with OS preinstalled.
 - [QEMU]: A generic machine emulator and virtualizer.
-  *This is a core of the vShell app.*
+  *This is a core of the ashell app.*
 - [Termux]: Android terminal emulator with package ecosystem.
-  *vShell borrowed some UI parts and terminal library from Termux.*
+  *ashell borrowed some UI parts and terminal library from Termux.*
 
 [Alpine Linux]: <https://alpinelinux.org/>
 [Android Terminal Emulator]: <https://github.com/jackpal/Android-Terminal-Emulator>
 [ConnectBot]: <https://github.com/connectbot/connectbot>
-[GitHub Releases]: <https://github.com/xeffyr/android-vshell/releases>
+[GitHub Releases]: <https://github.com/xeffyr/android-ashell/releases>
 [Limbo Emulator]: <https://github.com/limboemu/limbo>
 [QEMU]: <https://qemu.org>
 [Termux]: <https://termux.com>
 [UserLAnd]: <https://github.com/CypherpunkArmory/UserLAnd>
 [author]: <https://github.com/xeffyr>
-[download]: <https://github.com/xeffyr/android-vshell/releases/latest>
+[download]: <https://github.com/xeffyr/android-ashell/releases/latest>
 [iSH]: <https://github.com/ish-app/ish>
-[vShell]: <https://github.com/xeffyr/android-vshell>
+[ashell]: <https://github.com/xeffyr/android-ashell>

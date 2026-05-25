@@ -1,6 +1,6 @@
 /*
 *************************************************************************
-vShell - x86 Linux virtual shell application powered by QEMU.
+ashell - x86 Linux virtual shell application powered by QEMU.
 Copyright (C) 2019-2021  Leonid Pliushch <leonid.pliushch@gmail.com>
 
 Originally was part of Termux.
@@ -28,7 +28,7 @@ package app.virtshell.emulator;
 final class JNI {
 
     static {
-        System.loadLibrary("vshell-engine");
+        System.loadLibrary("ashell-engine");
     }
 
     /**

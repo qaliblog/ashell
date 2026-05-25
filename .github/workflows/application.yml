@@ -70,6 +70,7 @@ jobs:
           path: native-packages/jniLibs
       - name: Build
         run: |
+          ./gradlew getSystemImage
           ./gradlew assembleDebug
           mkdir -p artifacts
           mv ./app/build/outputs/apk/debug/*.apk ./artifacts/
@@ -96,6 +97,7 @@ jobs:
         env:
           KEY_PASSPHRASE: ${{ secrets.KEY_PASSPHRASE }}
         run: |
+          ./gradlew getSystemImage
           ./gradlew assembleRelease
           mkdir -p artifacts
           mv ./app/build/outputs/apk/release/vshell-*-universal-release.apk ./artifacts/

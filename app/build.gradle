@@ -9,6 +9,8 @@ android {
     dependencies {
         implementation "androidx.annotation:annotation:1.2.0"
         implementation "androidx.preference:preference:1.1.1"
+        implementation "com.google.android.material:material:1.3.0"
+        implementation "androidx.drawerlayout:drawerlayout:1.1.1"
     }
 
     defaultConfig {
@@ -18,7 +20,7 @@ android {
         versionCode 21
         versionName "1.21"
 
-        archivesBaseName = "vshell-v$versionName"
+        archivesBaseName = "ashell-v$versionName"
 
         splits {
             abi {
@@ -32,8 +34,8 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('vshell_release.jks')
-            keyAlias 'vShell'
+            storeFile file('ashell_release.jks')
+            keyAlias 'ashell'
             storePassword System.getenv("KEY_PASSPHRASE")
             keyPassword System.getenv("KEY_PASSPHRASE")
         }

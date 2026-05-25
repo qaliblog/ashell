@@ -1,6 +1,6 @@
 /*
 *************************************************************************
-vShell - x86 Linux virtual shell application powered by QEMU.
+ashell - x86 Linux virtual shell application powered by QEMU.
 Copyright (C) 2019-2021  Leonid Pliushch <leonid.pliushch@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -48,8 +48,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.autofill.AutofillManager;
 import android.widget.EditText;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -109,13 +112,28 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
      */
     private boolean mIsVisible;
 
+    private DrawerLayout mDrawerLayout;
+    private ListView mSessionsListView;
+    private ArrayAdapter<TerminalSession> mSessionsAdapter;
+
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        setContentView(R.layout.main);
+        setContentView(R.layout.drawer_layout);
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+        mSessionsListView = findViewById(R.id.sessions_list);
+        findViewById(R.id.new_session_button).setOnClickListener(v -> {
+            addNewSession();
+            mDrawerLayout.closeDrawers();
+        });
 
         mTerminalView = findViewById(R.id.terminal_view);
         mTerminalView.setOnKeyListener(new InputDispatcher(this));
+        mTerminalView.setOnLongClickListener(v -> {
+            mDrawerLayout.openDrawer(android.view.Gravity.LEFT);
+            return true;
+        });
         mTerminalView.setKeepScreenOn(true);
         mTerminalView.requestFocus();
         setupTerminalStyle();
@@ -260,20 +278,29 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
 
             @Override
             public void onSessionFinished(final TerminalSession finishedSession) {
-                // Needed for resetting font size on next application launch
-                // otherwise it will be reset only after force-closing.
-                TerminalActivity.currentFontSize = -1;
+                if (mIsVisible) {
+                    mSessionsAdapter.notifyDataSetChanged();
+                }
 
-                // Do not immediately terminate service in debug builds.
-                if (!BuildConfig.DEBUG) {
-                    if (mTermService.mWantsToStop) {
-                        // The service wants to stop as soon as possible.
-                        if (!TerminalActivity.this.isFinishing()) {
-                            finish();
+                if (mTermService.getSessions().size() == 0) {
+                    // Needed for resetting font size on next application launch
+                    // otherwise it will be reset only after force-closing.
+                    TerminalActivity.currentFontSize = -1;
+
+                    // Do not immediately terminate service in debug builds.
+                    if (!BuildConfig.DEBUG) {
+                        if (mTermService.mWantsToStop) {
+                            // The service wants to stop as soon as possible.
+                            if (!TerminalActivity.this.isFinishing()) {
+                                finish();
+                            }
+                            return;
                         }
-                        return;
+                        mTermService.terminateService();
                     }
-                    mTermService.terminateService();
+                } else if (mTerminalView.getCurrentSession() == finishedSession) {
+                    TerminalSession nextSession = mTermService.getSessions().get(0);
+                    mTerminalView.attachSession(nextSession);
                 }
             }
 
@@ -298,15 +325,21 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
             }
         };
 
-        if (mTermService.getSession() == null) {
+        mSessionsAdapter = new ArrayAdapter<TerminalSession>(this, android.R.layout.simple_list_item_1, mTermService.getSessions());
+        mSessionsListView.setAdapter(mSessionsAdapter);
+        mSessionsListView.setOnItemClickListener((parent, view, position, id) -> {
+            TerminalSession session = mSessionsAdapter.getItem(position);
+            mTerminalView.attachSession(session);
+            mDrawerLayout.closeDrawers();
+        });
+
+        if (mTermService.getSessions().isEmpty()) {
             if (mIsVisible) {
                 Installer.setupIfNeeded(TerminalActivity.this, () -> {
                     if (mTermService == null) return; // Activity might have been destroyed.
 
                     try {
-                        TerminalSession session = startQemu();
-                        mTerminalView.attachSession(session);
-                        mTermService.setSession(session);
+                        addNewSession();
                     } catch (WindowManager.BadTokenException e) {
                         // Activity finished - ignore.
                     }
@@ -318,8 +351,15 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
                 }
             }
         } else {
-            mTerminalView.attachSession(mTermService.getSession());
+            mTerminalView.attachSession(mTermService.getSessions().get(0));
         }
+    }
+
+    private void addNewSession() {
+        TerminalSession session = startQemu();
+        mTermService.getSessions().add(session);
+        mTerminalView.attachSession(session);
+        if (mSessionsAdapter != null) mSessionsAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -429,7 +469,7 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         ArrayList<String> processArgs = new ArrayList<>();
 
         // Fake argument to provide argv[0].
-        processArgs.add("vShell");
+        processArgs.add("ashell");
 
         // Path to directory with firmware & keymap files.
         processArgs.addAll(Arrays.asList("-L", runtimeDataPath));
@@ -447,8 +487,15 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         processArgs.add("-nodefaults");
 
         // SCSI CD-ROM(s) and HDD(s).
-        processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
-            + Config.CDROM_IMAGE_NAME + ",if=none,media=cdrom,index=0,id=cd0"));
+        String customIsoUri = mSettings.getCustomIsoUri();
+        if (customIsoUri != null) {
+            // For simplicity, we try to use the URI directly if possible or copy it.
+            // In a full implementation, we'd need to handle persistent URI permissions.
+            processArgs.addAll(Arrays.asList("-drive", "file=" + customIsoUri + ",if=none,media=cdrom,index=0,id=cd0"));
+        } else {
+            processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
+                + Config.CDROM_IMAGE_NAME + ",if=none,media=cdrom,index=0,id=cd0"));
+        }
         processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
             + Config.HDD_IMAGE_NAME
             + ",if=none,index=2,discard=unmap,detect-zeroes=unmap,cache=writeback,id=hd0"));
@@ -461,7 +508,8 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         // Try to boot from HDD.
         // Default HDD setup has a valid MBR allowing to try next drive in case if OS not
         // installed, so CD-ROM is going to be actually booted.
-        processArgs.addAll(Arrays.asList("-boot", "c,menu=on"));
+        // Using 'order=dc' to prioritize HDD over CD-ROM for persistence.
+        processArgs.addAll(Arrays.asList("-boot", "order=dc,menu=on"));
 
         // Setup random number generator.
         processArgs.addAll(Arrays.asList("-object", "rng-random,filename=/dev/urandom,id=rng0"));
@@ -474,7 +522,6 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         // This port will be exposed to external network. User should take care about security.
         int sshPort = getFreePort();
         if (sshPort != -1) {
-            mTermService.SSH_PORT = sshPort;
             vmnicArgs = vmnicArgs + ",hostfwd=tcp::" + sshPort + "-:22";
         }
 
@@ -486,7 +533,6 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         for (int attempt=0; attempt<3; attempt++) {
             webPort = getFreePort();
             if (webPort != sshPort && webPort != -1) {
-                mTermService.WEB_PORT = webPort;
                 vmnicArgs = vmnicArgs + ",hostfwd=tcp::" + webPort + "-:80";
                 break;
             } else {
@@ -500,9 +546,9 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         // Access to shared storage.
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             processArgs.addAll(Arrays.asList("-fsdev",
-                "local,security_model=mapped-file,id=fsdev0,multidevs=remap,path=/storage/self/primary"));
+                "local,security_model=none,id=fsdev0,multidevs=remap,path=" + Environment.getExternalStorageDirectory().getAbsolutePath()));
             processArgs.addAll(Arrays.asList("-device",
-                "virtio-9p-pci,fsdev=fsdev0,mount_tag=host_storage,id=virtio-9p-pci0"));
+                "virtio-9p-pci,fsdev=fsdev0,mount_tag=sdcard,id=virtio-9p-pci0"));
         }
 
         // We need only monitor & serial consoles.
@@ -520,6 +566,8 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
 
         TerminalSession session = new TerminalSession(processArgs.toArray(new String[0]),
             environment.toArray(new String[0]), Config.getDataDirectory(appContext), mTermService);
+        session.mSshPort = sshPort;
+        session.mWebPort = webPort;
 
         // Notify user that booting can take a while.
         Toast.makeText(this, R.string.toast_boot_notification, Toast.LENGTH_LONG).show();
@@ -539,13 +587,14 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         menu.add(Menu.NONE, CONTEXTMENU_SHOW_HELP, Menu.NONE, R.string.menu_show_help);
-        if (mTermService != null) {
-            if (mTermService.SSH_PORT != -1) {
-                menu.add(Menu.NONE, CONTEXTMENU_OPEN_SSH, Menu.NONE, getResources().getString(R.string.menu_open_ssh, "localhost:" + mTermService.SSH_PORT));
+        TerminalSession session = mTerminalView.getCurrentSession();
+        if (session != null) {
+            if (session.mSshPort != -1) {
+                menu.add(Menu.NONE, CONTEXTMENU_OPEN_SSH, Menu.NONE, getResources().getString(R.string.menu_open_ssh, "localhost:" + session.mSshPort));
             }
 
-            if (mTermService.WEB_PORT != -1) {
-                menu.add(Menu.NONE, CONTEXTMENU_OPEN_WEB, Menu.NONE, getResources().getString(R.string.menu_open_web, "localhost:" + mTermService.WEB_PORT));
+            if (session.mWebPort != -1) {
+                menu.add(Menu.NONE, CONTEXTMENU_OPEN_WEB, Menu.NONE, getResources().getString(R.string.menu_open_web, "localhost:" + session.mWebPort));
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -594,7 +643,7 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
                         }
 
                         // Such URLs handled by applications like ConnectBot.
-                        String address = "ssh://" + userName + "@127.0.0.1:" + mTermService.SSH_PORT + "/#vShell";
+                        String address = "ssh://" + userName + "@127.0.0.1:" + (mTerminalView.getCurrentSession() != null ? mTerminalView.getCurrentSession().mSshPort : 0) + "/#ashell";
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(address));
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         try {
@@ -612,8 +661,8 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
             case CONTEXTMENU_OPEN_WEB:
                 int webPort = -1;
 
-                if (mTermService != null) {
-                    webPort = mTermService.WEB_PORT;
+                if (mTerminalView.getCurrentSession() != null) {
+                    webPort = mTerminalView.getCurrentSession().mWebPort;
                 }
 
                 if (webPort != -1) {
