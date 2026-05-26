@@ -4,7 +4,7 @@
 
 ### Overview
 
-vShell is a virtual shell environment application for the Android OS. It
+ashell is a virtual shell environment application for the Android OS. It
 provides a virtual machine running small Linux distribution ready for the
 use out-of-box.
 
@@ -23,9 +23,9 @@ are discarded unless were saved to the disk with the utility [lbu](https://wiki.
 In order to change this behavior, you will need to format HDD and re-install
 the system from scratch, which could be easily done via 'setup-alpine' utility.
 
-**Disclaimer**: neither vShell application nor its author is affiliated with
+**Disclaimer**: neither ashell application nor its author is affiliated with
 the [Alpine Linux](https://alpinelinux.org/) project. Operating system is
-provided as-is and vShell author is not responsible about bugs in the software
+provided as-is and ashell author is not responsible about bugs in the software
 packages.
 
 *This guide does not cover Shell Scripting and Linux System Administration
@@ -36,12 +36,12 @@ topics.*
 ### User interface
 #### Terminal
 
-vShell application uses the XTerm-compatible terminal emulator as a frontend
+ashell application uses the XTerm-compatible terminal emulator as a frontend
 for a serial console of the virtual machine. It has a True Color support and
 uses Inconsolata LGC font patched by Nerd-Fonts for additional glyphs support.
 
 <span style="display:block;text-align:center">
-  <img alt="vShell session" src="img/terminal.png" style="width:90%;max-width:700px;">
+  <img alt="ashell session" src="img/terminal.png" style="width:90%;max-width:700px;">
 </span>
 
 The application does not provide a way for customizing the terminal style like
@@ -78,7 +78,7 @@ the nature of the serial line, which does not support a screen size handshaking.
 </span>
 
 To solve the issue, you need to use a command `resize` after changing the text
-scale. A default setup of the operating system provided by vShell application
+scale. A default setup of the operating system provided by ashell application
 runs this command automatically in a preexec hook of Zsh shell.
 
 #### Notification
@@ -183,10 +183,10 @@ shortcuts for opening either SSH client (e.g. ConnectBot) or Web browser.
   <img alt="Context menu screenshot" src="img/port_forwarding.png" style="width:90%;max-width:700px;">
 </span>
 
-vShell comes without any server software installed. You have to install
+ashell comes without any server software installed. You have to install
 and configure it on your own. Just remember that it should listen on
 TCP port 22 or 80.
 
 ***
 
-<p style="text-align:center;"><font size="1dp"><i>vShell — a virtual shell environment application.</i></font></p>
+<p style="text-align:center;"><font size="1dp"><i>ashell — a virtual shell environment application.</i></font></p>

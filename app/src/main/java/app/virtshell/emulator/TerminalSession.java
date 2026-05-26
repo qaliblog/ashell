@@ -1,6 +1,6 @@
 /*
 *************************************************************************
-vShell - x86 Linux virtual shell application powered by QEMU.
+ashell - x86 Linux virtual shell application powered by QEMU.
 Copyright (C) 2019-2021  Leonid Pliushch <leonid.pliushch@gmail.com>
 
 Originally was part of Termux.
@@ -119,6 +119,14 @@ public final class TerminalSession extends TerminalOutput {
 
     /** Set by the application for user identification of session, not by terminal. */
     public String mSessionName;
+
+    public int mSshPort = -1;
+    public int mWebPort = -1;
+
+    @Override
+    public String toString() {
+        return mSessionName != null ? mSessionName : "Session " + mHandle.substring(0, 8);
+    }
 
     @SuppressLint("HandlerLeak")
     final Handler mMainThreadHandler = new Handler() {

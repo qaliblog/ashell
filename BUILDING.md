@@ -3,7 +3,7 @@
 ## Project structure
 
 This project has been started as fork of [Termux](https://github.com/termux)
-application. There many common things, however as vShell needs only terminal
+application. There many common things, however as ashell needs only terminal
 user interface, many things were either removed or modified to be suitable
 for the new project.
 

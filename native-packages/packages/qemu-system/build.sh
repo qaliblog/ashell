@@ -81,6 +81,6 @@ builder_step_post_make_install() {
 	esac
 
 	install -Dm600 "$PACKAGE_INSTALL_PREFIX"/lib/libqemu-system-x86_64.so \
-		"${BUILDER_SCRIPTDIR}/jniLibs/${bindir}/libvshell-engine.so"
-	"$STRIP" -s "${BUILDER_SCRIPTDIR}/jniLibs/${bindir}/libvshell-engine.so"
+		"${BUILDER_SCRIPTDIR}/jniLibs/${bindir}/libashell-engine.so"
+	"$STRIP" -s "${BUILDER_SCRIPTDIR}/jniLibs/${bindir}/libashell-engine.so"
 }

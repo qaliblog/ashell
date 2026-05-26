@@ -1,6 +1,6 @@
 /*
 *************************************************************************
-vShell - x86 Linux virtual shell application powered by QEMU.
+ashell - x86 Linux virtual shell application powered by QEMU.
 Copyright (C) 2019-2021  Leonid Pliushch <leonid.pliushch@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -224,7 +224,7 @@ public final class ExtraKeysView extends GridLayout {
                                 mScheduledExecutor.scheduleWithFixedDelay(() -> {
                                     mLongPressCount++;
                                     sendKey(root, buttonText);
-                                }, 400, 80, TimeUnit.MILLISECONDS);
+                                }, 150, 40, TimeUnit.MILLISECONDS);
                             }
                             return true;
                         case MotionEvent.ACTION_MOVE:
