@@ -1,7 +1,3 @@
-# Build with:
-#  docker build -t xeffyr/native-packages-buildenv .
-# Push to docker hub with:
-#  docker push xeffyr/native-packages-buildenv
 FROM ubuntu:20.04
 
 # Fix locale to avoid warnings:
