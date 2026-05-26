@@ -129,8 +129,11 @@ jobs:
           name: ashell-release-${{ github.sha }}
           path: artifacts
       - name: Publish all to release
-        uses: fnkr/github-action-ghr@v1.3
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.apk
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || 'latest' }}
+          prerelease: ${{ github.ref_type != 'tag' }}
+          generate_release_notes: true
         env:
-          GHR_PATH: artifacts/
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GHR_REPLACE: true
