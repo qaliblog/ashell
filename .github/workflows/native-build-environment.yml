@@ -18,7 +18,7 @@ jobs:
       - name: Login to Docker registry
         uses: docker/login-action@v3
         with:
-          registry: docker.pkg.github.com
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push
@@ -26,4 +26,4 @@ jobs:
         with:
           push: true
           context: native-packages/scripts
-          tags: docker.pkg.github.com/${{ github.repository }}/native-packages-buildenv:latest
+          tags: ghcr.io/${{ github.repository_owner }}/ashell-buildenv:latest
