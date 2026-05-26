@@ -30,4 +30,4 @@ jobs:
         with:
           push: true
           context: native-packages/scripts
-          tags: ghcr.io/${{ github.repository_owner }}/ashell-buildenv:latest
+          tags: ghcr.io/${{ env.REPO_LOWER }}/native-packages-buildenv:latest
