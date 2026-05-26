@@ -211,7 +211,7 @@ public class TerminalService extends Service implements SessionChangedCallback {
         // PendingIntent#getActivity(): "Note that the activity will be started outside of the context of an existing
         // activity, so you must use the Intent.FLAG_ACTIVITY_NEW_TASK launch flag in the Intent":
         notifyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_IMMUTABLE);
 
         StringBuilder contentText = new StringBuilder();
 
@@ -248,10 +248,10 @@ public class TerminalService extends Service implements SessionChangedCallback {
             R.string.notification_action_wake_unlock :
             R.string.notification_action_wake_lock);
         int actionIcon = wakeLockHeld ? android.R.drawable.ic_lock_idle_lock : android.R.drawable.ic_lock_lock;
-        builder.addAction(actionIcon, actionTitle, PendingIntent.getService(this, 0, toggleWakeLockIntent, 0));
+        builder.addAction(actionIcon, actionTitle, PendingIntent.getService(this, 0, toggleWakeLockIntent, PendingIntent.FLAG_IMMUTABLE));
 
         Intent exitIntent = new Intent(this, TerminalService.class).setAction(INTENT_ACTION_SERVICE_STOP);
-        builder.addAction(android.R.drawable.ic_delete, getResources().getString(R.string.notification_action_shutdown), PendingIntent.getService(this, 0, exitIntent, 0));
+        builder.addAction(android.R.drawable.ic_delete, getResources().getString(R.string.notification_action_shutdown), PendingIntent.getService(this, 0, exitIntent, PendingIntent.FLAG_IMMUTABLE));
 
         return builder.build();
     }

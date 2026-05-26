@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="app.virtshell"
     android:installLocation="internalOnly">
 
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -20,7 +19,6 @@
         android:maxSdkVersion="29" />
 
     <application
-        android:extractNativeLibs="true"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
