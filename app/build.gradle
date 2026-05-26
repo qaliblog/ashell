@@ -35,10 +35,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('ashell_release.jks')
+            storeFile file('vshell_release.jks')
             keyAlias 'ashell'
-            storePassword System.getenv("KEY_PASSPHRASE")
-            keyPassword System.getenv("KEY_PASSPHRASE")
+            storePassword 'ashell'
+            keyPassword 'ashell'
         }
     }
 

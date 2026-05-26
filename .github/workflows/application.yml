@@ -79,17 +79,16 @@ jobs:
           ./gradlew getSystemImage
           ./gradlew assembleDebug
           mkdir -p artifacts
-          mv ./app/build/outputs/apk/debug/*.apk ./artifacts/
+          find ./app/build/outputs/apk/debug -name "*.apk" -exec mv {} ./artifacts/ \;
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ashell-debug-${{ github.sha }}
           path: ./artifacts/*.apk
-          retention-days: 7
+          retention-days: 1
   build-release:
     name: Build release APK
     needs: build-jni
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -101,15 +100,37 @@ jobs:
           path: native-packages/jniLibs
           merge-multiple: true
       - name: Build
-        env:
-          KEY_PASSPHRASE: ${{ secrets.KEY_PASSPHRASE }}
         run: |
           ./gradlew getSystemImage
           ./gradlew assembleRelease
           mkdir -p artifacts
-          mv ./app/build/outputs/apk/release/ashell-*-universal-release.apk ./artifacts/
-      - name: Publish release
+          find ./app/build/outputs/apk/release -name "*.apk" -exec mv {} ./artifacts/ \;
+      - name: Store artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ashell-release-${{ github.sha }}
+          path: ./artifacts/*.apk
+          retention-days: 1
+  publish:
+    name: Publish APKs to Release
+    needs: [build-debug, build-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Debug APKs
+        uses: actions/download-artifact@v4
+        with:
+          name: ashell-debug-${{ github.sha }}
+          path: artifacts
+      - name: Download Release APKs
+        uses: actions/download-artifact@v4
+        with:
+          name: ashell-release-${{ github.sha }}
+          path: artifacts
+      - name: Publish all to release
         uses: fnkr/github-action-ghr@v1.3
         env:
           GHR_PATH: artifacts/
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHR_REPLACE: true
