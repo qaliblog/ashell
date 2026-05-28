@@ -31,10 +31,12 @@ public class TerminalPreferences {
     private static final String PREF_IGNORE_BELL = "ignore_bell";
     private static final String PREF_DATA_VERSION = "data_version";
     private static final String PREF_DEFAULT_SSH_USER = "default_ssh_user";
+    private static final String PREF_SETUP_DONE = "pref_setup_done";
 
     private boolean mFirstRun;
     private boolean mShowExtraKeys;
     private boolean mIgnoreBellCharacter;
+    private boolean mSetupDone;
     private int mDataVersion;
     private String mDefaultSshUser;
 
@@ -43,6 +45,7 @@ public class TerminalPreferences {
         mFirstRun = prefs.getBoolean(PREF_FIRST_RUN, true);
         mShowExtraKeys = prefs.getBoolean(PREF_SHOW_EXTRA_KEYS, true);
         mIgnoreBellCharacter = prefs.getBoolean(PREF_IGNORE_BELL, false);
+        mSetupDone = prefs.getBoolean(PREF_SETUP_DONE, false);
         mDataVersion = prefs.getInt(PREF_DATA_VERSION, 0);
         mDefaultSshUser = prefs.getString(PREF_DEFAULT_SSH_USER, "root");
     }
@@ -105,5 +108,15 @@ public class TerminalPreferences {
 
     public String getCustomIsoUri(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString("custom_iso_uri", null);
+    }
+
+    public boolean isSetupDone() {
+        return mSetupDone;
+    }
+
+    public void setSetupDone(Context context, boolean newValue) {
+        mSetupDone = newValue;
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putBoolean(PREF_SETUP_DONE, newValue).apply();
     }
 }
