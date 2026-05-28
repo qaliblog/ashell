@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true">
 
-    <app.virtshell.terminal_view.TerminalView
+    <com.qali.ashell.terminal_view.TerminalView
         android:id="@+id/terminal_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,7 +18,7 @@
         android:importantForAutofill="no"
         android:autofillHints="password" />
 
-    <app.virtshell.ExtraKeysView
+    <com.qali.ashell.ExtraKeysView
         android:id="@+id/extra_keys"
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"

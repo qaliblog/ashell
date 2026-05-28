@@ -149,7 +149,7 @@ diff -uNr qemu-6.1.0/softmmu/main.c qemu-6.1.0.mod/softmmu/main.c
 +    }
 +}
 +
-+JNIEXPORT jint JNICALL Java_app_virtshell_emulator_JNI_createSubprocess(
++JNIEXPORT jint JNICALL Java_com_qali_ashell_emulator_JNI_createSubprocess(
 +        JNIEnv* env,
 +        jclass APPLICATION_UNUSED(clazz),
 +        jobjectArray args,
@@ -210,13 +210,13 @@ diff -uNr qemu-6.1.0/softmmu/main.c qemu-6.1.0.mod/softmmu/main.c
 +    return ptm;
 +}
 +
-+JNIEXPORT void JNICALL Java_app_virtshell_emulator_JNI_setPtyWindowSize(JNIEnv* APPLICATION_UNUSED(env), jclass APPLICATION_UNUSED(clazz), jint fd, jint rows, jint cols)
++JNIEXPORT void JNICALL Java_com_qali_ashell_emulator_JNI_setPtyWindowSize(JNIEnv* APPLICATION_UNUSED(env), jclass APPLICATION_UNUSED(clazz), jint fd, jint rows, jint cols)
 +{
 +    struct winsize sz = { .ws_row = rows, .ws_col = cols };
 +    ioctl(fd, TIOCSWINSZ, &sz);
 +}
 +
-+JNIEXPORT void JNICALL Java_app_virtshell_emulator_JNI_setPtyUTF8Mode(JNIEnv* APPLICATION_UNUSED(env), jclass APPLICATION_UNUSED(clazz), jint fd)
++JNIEXPORT void JNICALL Java_com_qali_ashell_emulator_JNI_setPtyUTF8Mode(JNIEnv* APPLICATION_UNUSED(env), jclass APPLICATION_UNUSED(clazz), jint fd)
 +{
 +    struct termios tios;
 +    tcgetattr(fd, &tios);
@@ -226,7 +226,7 @@ diff -uNr qemu-6.1.0/softmmu/main.c qemu-6.1.0.mod/softmmu/main.c
 +    }
 +}
 +
-+JNIEXPORT int JNICALL Java_app_virtshell_emulator_JNI_waitFor(JNIEnv* APPLICATION_UNUSED(env), jclass APPLICATION_UNUSED(clazz), jint pid)
++JNIEXPORT int JNICALL Java_com_qali_ashell_emulator_JNI_waitFor(JNIEnv* APPLICATION_UNUSED(env), jclass APPLICATION_UNUSED(clazz), jint pid)
 +{
 +    int status;
 +    waitpid(pid, &status, 0);
@@ -240,7 +240,7 @@ diff -uNr qemu-6.1.0/softmmu/main.c qemu-6.1.0.mod/softmmu/main.c
 +    }
 +}
 +
-+JNIEXPORT void JNICALL Java_app_virtshell_emulator_JNI_close(JNIEnv* APPLICATION_UNUSED(env), jclass APPLICATION_UNUSED(clazz), jint fileDescriptor)
++JNIEXPORT void JNICALL Java_com_qali_ashell_emulator_JNI_close(JNIEnv* APPLICATION_UNUSED(env), jclass APPLICATION_UNUSED(clazz), jint fileDescriptor)
 +{
 +    close(fileDescriptor);
 +}
