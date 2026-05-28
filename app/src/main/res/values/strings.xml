@@ -63,7 +63,7 @@
     <string name="toast_no_storage_permission">Could not proceed without storage access permission!</string>
     <string name="toast_reset_terminal">Terminal state has been reset.</string>
 
-    <string name="setup_done_label">Boot from HDD (Setup Finished)</string>
+    <string name="setup_done_label">Persistent HDD Boot (Requires Install)</string>
     <string name="iso_settings_label">ISO Settings</string>
-    <string name="toast_snapshot_mode_warning">Secondary session: Changes will not be saved (Snapshot mode)</string>
+    <string name="toast_snapshot_mode_warning">Secondary VM: Isolated session. Use /media/host to share files.</string>
 </resources>

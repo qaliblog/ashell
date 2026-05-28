@@ -296,7 +296,21 @@ page-break-after: avoid;
 <li>Network: user-mode via SLiRP.</li>
 <li>Operating system: <a href="https://alpinelinux.org/">Alpine Linux</a>.</li>
 </ul>
-<p>Please note that provided default setup of the Alpine Linux is diskless. The whole operating system is copied into RAM, which takes about 80 MB. All changes are discarded unless were saved to the disk with the utility <a href="https://wiki.alpinelinux.org/wiki/Alpine_local_backup">lbu</a>. In order to change this behavior, you will need to format HDD and re-install the system from scratch, which could be easily done via ‘setup-alpine’ utility.</p>
+<p>Please note that provided default setup of the Alpine Linux is diskless. The whole operating system is copied into RAM, which takes about 80 MB. All changes are discarded unless were saved to the disk with the utility <a href="https://wiki.alpinelinux.org/wiki/Alpine_local_backup">lbu</a>.</p>
+
+<h3 id="hdd-installation-persistence">HDD Installation (Persistence)</h3>
+<p>For a traditional persistent installation where changes are automatically saved, you can install Alpine to the virtual hard drive:</p>
+<ol>
+<li>Clear existing data: <code>rm -rf /etc/apk/cache /etc/motd /media/sda1/*</code></li>
+<li>Run the disk setup: <code>setup-disk -m sys /media/sda1/</code></li>
+<li>Install the bootloader: <code>extlinux --install /media/sda1/boot</code></li>
+<li>Reboot the VM.</li>
+<li>Open the session drawer and enable <strong>Persistent HDD Boot (Requires Install)</strong>.</li>
+</ol>
+
+<h3 id="multi-session">Multi-session</h3>
+<p>You can open multiple terminal sessions using the <strong>New Session</strong> button in the drawer. Note that each session runs a <strong>completely separate virtual machine instance</strong>. Changes made in one session's local filesystem will not be visible in another.</p>
+<p>To share files between sessions or with the Android host, use the <code>/media/host</code> directory, which points to your device's shared storage.</p>
 <p><strong>Disclaimer</strong>: neither ashell application nor its author is affiliated with the <a href="https://alpinelinux.org/">Alpine Linux</a> project. Operating system is provided as-is and ashell author is not responsible about bugs in the software packages.</p>
 <p><em>This guide does not cover Shell Scripting and Linux System Administration topics.</em></p>
 <hr />
