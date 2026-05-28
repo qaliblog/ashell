@@ -42,7 +42,7 @@ public class StartupActivity extends Activity {
         findViewById(R.id.pick_iso_file).setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("application/x-iso9660-image");
+            intent.setType("*/*");
             startActivityForResult(intent, PICK_ISO_REQUEST_CODE);
         });
 

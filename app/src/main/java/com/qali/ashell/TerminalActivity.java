@@ -513,16 +513,16 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
             if (customIsoUri != null) {
                 // For simplicity, we try to use the URI directly if possible or copy it.
                 // In a full implementation, we'd need to handle persistent URI permissions.
-                processArgs.addAll(Arrays.asList("-drive", "file=" + customIsoUri + ",if=none,media=cdrom,index=0,id=cd0"));
+                processArgs.addAll(Arrays.asList("-drive", "file=" + customIsoUri + ",file.locking=off,if=none,media=cdrom,index=0,id=cd0"));
             } else {
                 processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
-                    + Config.CDROM_IMAGE_NAME + ",if=none,media=cdrom,index=0,id=cd0"));
+                    + Config.CDROM_IMAGE_NAME + ",file.locking=off,if=none,media=cdrom,index=0,id=cd0"));
             }
         }
 
         processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
             + Config.HDD_IMAGE_NAME
-            + ",if=none,index=2,discard=unmap,detect-zeroes=unmap,cache=writeback,id=hd0"));
+            + ",file.locking=off,if=none,index=2,discard=unmap,detect-zeroes=unmap,cache=writeback,id=hd0"));
         processArgs.addAll(Arrays.asList("-device", "virtio-scsi-pci,id=virtio-scsi-pci0"));
 
         if (!mSettings.isSetupDone()) {
