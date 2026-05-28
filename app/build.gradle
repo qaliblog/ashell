@@ -4,7 +4,7 @@ import java.security.MessageDigest
 apply plugin: 'com.android.application'
 
 android {
-    namespace "app.virtshell"
+    namespace "com.qali.ashell"
     compileSdkVersion 30
 
     dependencies {
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.virtshell"
+        applicationId "com.qali.ashell"
         minSdkVersion 24
         targetSdkVersion 30
         versionCode 21
