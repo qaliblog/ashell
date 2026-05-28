@@ -22,6 +22,17 @@ public class StartupActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        TerminalPreferences settings = new TerminalPreferences(this);
+        boolean forceSettings = getIntent().getBooleanExtra("force_settings", false);
+        boolean hasIso = settings.getCustomIsoUri(this) != null || new File(Config.getDataDirectory(this), Config.CDROM_IMAGE_NAME).exists();
+
+        if (!forceSettings && (settings.isSetupDone() || hasIso)) {
+            startActivity(new Intent(this, TerminalActivity.class));
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_startup);
 
         findViewById(R.id.download_default_iso).setOnClickListener(v -> {

@@ -24,7 +24,22 @@
                 android:id="@+id/new_session_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:text="New Session" />
+
+            <CheckBox
+                android:id="@+id/setup_done_checkbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/setup_done_label" />
+
+            <Button
+                android:id="@+id/iso_settings_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/iso_settings_label" />
 
             <ListView
                 android:id="@+id/sessions_list"

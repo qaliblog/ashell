@@ -47,6 +47,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.autofill.AutofillManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -334,6 +335,19 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
             mDrawerLayout.closeDrawers();
         });
 
+        CheckBox setupDoneCheckbox = findViewById(R.id.setup_done_checkbox);
+        setupDoneCheckbox.setChecked(mSettings.isSetupDone());
+        setupDoneCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            mSettings.setSetupDone(TerminalActivity.this, isChecked);
+        });
+
+        findViewById(R.id.iso_settings_button).setOnClickListener(v -> {
+            Intent intent = new Intent(TerminalActivity.this, StartupActivity.class);
+            intent.putExtra("force_settings", true);
+            startActivity(intent);
+            finish();
+        });
+
         if (mTermService.getSessions().isEmpty()) {
             if (mIsVisible) {
                 Installer.setupIfNeeded(TerminalActivity.this, () -> {
@@ -487,30 +501,47 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         // Do not create default devices.
         processArgs.add("-nodefaults");
 
-        // SCSI CD-ROM(s) and HDD(s).
-        String customIsoUri = mSettings.getCustomIsoUri(this);
-        if (customIsoUri != null) {
-            // For simplicity, we try to use the URI directly if possible or copy it.
-            // In a full implementation, we'd need to handle persistent URI permissions.
-            processArgs.addAll(Arrays.asList("-drive", "file=" + customIsoUri + ",if=none,media=cdrom,index=0,id=cd0"));
-        } else {
-            processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
-                + Config.CDROM_IMAGE_NAME + ",if=none,media=cdrom,index=0,id=cd0"));
+        // Resolve write lock for secondary sessions.
+        if (mTermService.getSessions().size() > 0) {
+            processArgs.add("-snapshot");
+            Toast.makeText(this, R.string.toast_snapshot_mode_warning, Toast.LENGTH_LONG).show();
         }
+
+        // SCSI CD-ROM(s) and HDD(s).
+        if (!mSettings.isSetupDone()) {
+            String customIsoUri = mSettings.getCustomIsoUri(this);
+            if (customIsoUri != null) {
+                // For simplicity, we try to use the URI directly if possible or copy it.
+                // In a full implementation, we'd need to handle persistent URI permissions.
+                processArgs.addAll(Arrays.asList("-drive", "file=" + customIsoUri + ",if=none,media=cdrom,index=0,id=cd0"));
+            } else {
+                processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
+                    + Config.CDROM_IMAGE_NAME + ",if=none,media=cdrom,index=0,id=cd0"));
+            }
+        }
+
         processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
             + Config.HDD_IMAGE_NAME
             + ",if=none,index=2,discard=unmap,detect-zeroes=unmap,cache=writeback,id=hd0"));
         processArgs.addAll(Arrays.asList("-device", "virtio-scsi-pci,id=virtio-scsi-pci0"));
-        processArgs.addAll(Arrays.asList("-device",
-            "scsi-cd,bus=virtio-scsi-pci0.0,id=scsi-cd0,drive=cd0"));
+
+        if (!mSettings.isSetupDone()) {
+            processArgs.addAll(Arrays.asList("-device",
+                "scsi-cd,bus=virtio-scsi-pci0.0,id=scsi-cd0,drive=cd0"));
+        }
+
         processArgs.addAll(Arrays.asList("-device",
             "scsi-hd,bus=virtio-scsi-pci0.0,id=scsi-hd0,drive=hd0"));
 
         // Try to boot from HDD.
         // Default HDD setup has a valid MBR allowing to try next drive in case if OS not
         // installed, so CD-ROM is going to be actually booted.
-        // Using 'order=dc' to prioritize HDD over CD-ROM for persistence.
-        processArgs.addAll(Arrays.asList("-boot", "order=dc,menu=on"));
+        // Using 'order=c' when setup is done, 'order=cd' otherwise.
+        if (mSettings.isSetupDone()) {
+            processArgs.addAll(Arrays.asList("-boot", "order=c,menu=on"));
+        } else {
+            processArgs.addAll(Arrays.asList("-boot", "order=cd,menu=on"));
+        }
 
         // Setup random number generator.
         processArgs.addAll(Arrays.asList("-object", "rng-random,filename=/dev/urandom,id=rng0"));
