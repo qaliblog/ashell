@@ -375,6 +375,10 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         mTermService.getSessions().add(session);
         mTerminalView.attachSession(session);
         if (mSessionsAdapter != null) mSessionsAdapter.notifyDataSetChanged();
+
+        if (mTermService.getSessions().size() > 1) {
+            Toast.makeText(this, "Sessions are independent. Use /sdcard to share files.", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -496,7 +500,10 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
         // choose appropriate values.
         // mem[0] - tcg buffer size, mem[1] - vm ram buffer size.
         int[] mem = getSafeMem();
-        processArgs.addAll(Arrays.asList("-accel", "tcg,tb-size=" + mem[0], "-m", String.valueOf(mem[1])));
+        processArgs.addAll(Arrays.asList("-accel", "tcg,thread=multi,tb-size=" + mem[0], "-m", String.valueOf(mem[1])));
+
+        // Speed up boot by using multiple cores.
+        processArgs.addAll(Arrays.asList("-smp", "2"));
 
         // Do not create default devices.
         processArgs.add("-nodefaults");
@@ -513,16 +520,16 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
             if (customIsoUri != null) {
                 // For simplicity, we try to use the URI directly if possible or copy it.
                 // In a full implementation, we'd need to handle persistent URI permissions.
-                processArgs.addAll(Arrays.asList("-drive", "file=" + customIsoUri + ",if=none,media=cdrom,index=0,id=cd0"));
+                processArgs.addAll(Arrays.asList("-drive", "file=" + customIsoUri + ",file.locking=off,if=none,media=cdrom,index=0,id=cd0"));
             } else {
                 processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
-                    + Config.CDROM_IMAGE_NAME + ",if=none,media=cdrom,index=0,id=cd0"));
+                    + Config.CDROM_IMAGE_NAME + ",file.locking=off,if=none,media=cdrom,index=0,id=cd0"));
             }
         }
 
         processArgs.addAll(Arrays.asList("-drive", "file=" + runtimeDataPath + "/"
             + Config.HDD_IMAGE_NAME
-            + ",if=none,index=2,discard=unmap,detect-zeroes=unmap,cache=writeback,id=hd0"));
+            + ",file.locking=off,if=none,index=2,discard=unmap,detect-zeroes=unmap,cache=writeback,id=hd0"));
         processArgs.addAll(Arrays.asList("-device", "virtio-scsi-pci,id=virtio-scsi-pci0"));
 
         if (!mSettings.isSetupDone()) {
@@ -583,8 +590,8 @@ public final class TerminalActivity extends Activity implements ServiceConnectio
                 "virtio-9p-pci,fsdev=fsdev0,mount_tag=sdcard,id=virtio-9p-pci0"));
         }
 
-        // We need only monitor & serial consoles.
-        processArgs.add("-nographic");
+        // Support guest OSs that expect a display device (fixes Ubuntu blank screen).
+        processArgs.addAll(Arrays.asList("-display", "none", "-vga", "virtio"));
 
         // Disable parallel port.
         processArgs.addAll(Arrays.asList("-parallel", "none"));
